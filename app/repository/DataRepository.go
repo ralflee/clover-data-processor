@@ -55,3 +55,19 @@ func (r DataRepository) CreateTable(spec *model.Spec) error {
 	log.Printf("db table %s created", spec.Name)
 	return nil
 }
+
+func (r DataRepository) Insert(spec *model.Spec, records []*model.Record) error {
+	sql := "insert into " + spec.Name + " ("
+
+	cols := make([]string, len(spec.Columns))
+	for i, col := range spec.Columns {
+		cols[i] = col.Name
+	}
+
+	sql += strings.Join(cols, ",")
+	sql += ") values "
+
+	values := make([]string, len(records))
+
+	//TODO, not finished
+}

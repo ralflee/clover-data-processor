@@ -116,12 +116,10 @@ func main() {
 		fmt.Println(dataFiles)
 
 		for _, file := range dataFiles {
-			record, err := parser.ConstructRecord(file, s)
+			records, err := parser.ConstructRecords(file, s)
 			if err != nil {
 				log.Fatal(err)
 			}
-
-			fmt.Println(record)
 		}
 
 	}

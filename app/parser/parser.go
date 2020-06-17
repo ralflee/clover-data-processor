@@ -2,6 +2,7 @@ package parser
 
 import (
 	"bufio"
+	"clover-data-processor/app/constants"
 	"clover-data-processor/app/model"
 	"encoding/csv"
 	"errors"
@@ -20,13 +21,17 @@ import (
 //GetSpecFilesFromPath get files from path
 func GetSpecFilesFromPath(path string) []string {
 	var files []string
+	var validFile = regexp.MustCompile(`.*\.csv$`)
 	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 
 		if info.IsDir() {
 			return nil
 		}
 
-		files = append(files, path)
+		fileName := info.Name()
+		if validFile.MatchString(fileName) {
+			files = append(files, path)
+		}
 
 		return nil
 	})
@@ -51,7 +56,6 @@ func GetDataFilesFromPath(path string, specName string) []string {
 		}
 
 		fileName := info.Name()
-
 		//skip file which the name is not valid
 		if validFile.MatchString(fileName) {
 
@@ -116,8 +120,8 @@ func ConstructSpec(filePath string) (*model.Spec, error) {
 	return &s, nil
 }
 
-//ConstructRecord construct record
-func ConstructRecord(dataFilePath string, spec *model.Spec) (*model.Record, error) {
+//ConstructRecords construct record
+func ConstructRecords(dataFilePath string, spec *model.Spec) ([]*model.Record, error) {
 	file, err := os.Open(dataFilePath)
 	if err != nil {
 		log.Fatal(err)
@@ -125,19 +129,20 @@ func ConstructRecord(dataFilePath string, spec *model.Spec) (*model.Record, erro
 	}
 	defer file.Close()
 
+	var records []*model.Record
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		b := scanner.Bytes()
-		c := ""
+		//c := ""
 
-		for len(b) > 0 {
-			r, size := utf8.DecodeRune(b)
-			c += string(r)
-			b = b[size:len(b)]
+		// for len(b) > 0 {
+		// 	r, size := utf8.DecodeRune(b)
+		// 	c += string(r)
+		// 	b = b[size:len(b)]
 
-		}
-		fmt.Print(c)
-		fmt.Println("")
+		// }
+		record := bytesToRecord(b, spec)
+		records = append(records, record)
 		//fmt.Println(row)
 		//fmt.Println(len(row))
 		//fmt.Print(row[0:10])
@@ -156,9 +161,38 @@ func ConstructRecord(dataFilePath string, spec *model.Spec) (*model.Record, erro
 
 	}
 
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+	// if err := scanner.Err(); err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	return records, nil
+}
+
+func bytesToRecord(bytes []byte, spec *model.Spec) *model.Record {
+	var record model.Record
+	record.Columns = make([]interface{}, len(spec.Columns))
+	for i, col := range spec.Columns {
+		c := ""
+		for j := 0; j < col.Width; j++ {
+			r, size := utf8.DecodeRune(bytes)
+			c += string(r)
+			bytes = bytes[size:len(bytes)]
+		}
+
+		if col.Type == constants.ColumnTypeBoolean {
+			record.Columns[i] = c == "1"
+		} else if col.Type == constants.ColumnTypeInteger {
+			v, err := strconv.Atoi("-42")
+			if err != nil {
+				continue
+			}
+
+			record.Columns[i] = v
+		} else {
+			record.Columns[i] = c
+		}
+
 	}
 
-	return nil, nil
+	return &record
 }
