@@ -2,7 +2,6 @@ package parser
 
 import (
 	"bufio"
-	"clover-data-processor/app/constants"
 	"clover-data-processor/app/model"
 	"encoding/csv"
 	"errors"
@@ -15,11 +14,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"unicode/utf8"
 )
 
-//GetSpecFilesFromPath get files from path
-func GetSpecFilesFromPath(path string) []string {
+//GetSpecPath get files from path
+func GetSpecPath(path string) []string {
 	var files []string
 	var validFile = regexp.MustCompile(`.*\.csv$`)
 	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
@@ -42,8 +40,8 @@ func GetSpecFilesFromPath(path string) []string {
 	return files
 }
 
-//GetDataFilesFromPath get files from path
-func GetDataFilesFromPath(path string, specName string) []string {
+//GetDataPath get files from path
+func GetDataPath(path string, specName string) []string {
 	var files []string
 	var validFile = regexp.MustCompile(specName + `_[0-9]{4}-[0-9]{2}-[0-9]{2}.*\.txt$`)
 	var dateFormat = "2006-01-02"
@@ -168,32 +166,32 @@ func ConstructRecords(dataFilePath string, spec *model.Spec) ([]*model.Record, e
 	return records, nil
 }
 
-func bytesToRecord(bytes []byte, spec *model.Spec) *model.Record {
-	var record model.Record
-	record.Columns = make([]interface{}, len(spec.Columns))
-	for i, col := range spec.Columns {
-		c := ""
-		for j := 0; j < col.Width; j++ {
-			r, size := utf8.DecodeRune(bytes)
-			c += string(r)
-			bytes = bytes[size:]
-		}
+// func bytesToRecord(bytes []byte, spec *model.Spec) *model.Record {
+// 	var record model.Record
+// 	record.Columns = make([]interface{}, len(spec.Columns))
+// 	for i, col := range spec.Columns {
+// 		c := ""
+// 		for j := 0; j < col.Width; j++ {
+// 			r, size := utf8.DecodeRune(bytes)
+// 			c += string(r)
+// 			bytes = bytes[size:]
+// 		}
 
-		if col.Type == constants.ColumnTypeBoolean {
-			record.Columns[i] = c == "1"
-		} else if col.Type == constants.ColumnTypeInteger {
-			v, err := strconv.Atoi(strings.TrimSpace(c))
-			if err != nil {
-				continue
-			}
+// 		if col.Type == constants.ColumnTypeBoolean {
+// 			record.Columns[i] = c == "1"
+// 		} else if col.Type == constants.ColumnTypeInteger {
+// 			v, err := strconv.Atoi(strings.TrimSpace(c))
+// 			if err != nil {
+// 				continue
+// 			}
 
-			record.Columns[i] = v
-		} else {
-			//trim white spaces
-			record.Columns[i] = strings.TrimSpace(c)
-		}
+// 			record.Columns[i] = v
+// 		} else {
+// 			//trim white spaces
+// 			record.Columns[i] = strings.TrimSpace(c)
+// 		}
 
-	}
+// 	}
 
-	return &record
-}
+// 	return &record
+// }

@@ -20,7 +20,22 @@ skip
 
 The nature of data processer software is quite different from a typical CRUD 
 
+Abstraction:
+- service
+- data source
+- parser
+- repository
 
+## Service
+
+It own the data import logic:
+
+1. From a spec base path, get all spec path
+2. From a data base path, get all data path
+3. From a spec path, get spec struct(in java terms, get all spec objects)
+4. From a data path, get data struct(in java terms, get all data objects)
+5. For a spec struct, create a DB table
+6. For a data struct, insert a DB record
 
 ## Abnormal data handling
 

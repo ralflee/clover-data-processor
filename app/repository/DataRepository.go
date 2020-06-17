@@ -10,15 +10,13 @@ import (
 	"clover-data-processor/app/constants"
 )
 
+//DataRepository data repository
 type DataRepository struct {
 	DB *sql.DB
 }
 
-func (r DataRepository) CheckTableExists(tableName string) bool {
-	//var check string
-
-	//r.DB.QueryRow("SELECT 1 from '"+tableName+"'", tableName).Scan(check)
-	fmt.Println("aaa")
+//CheckTableExists Check table exists
+func (r *DataRepository) CheckTableExists(tableName string) bool {
 	_, err := r.DB.Query("select 1 from " + tableName)
 	if err != nil {
 		return false
@@ -28,7 +26,7 @@ func (r DataRepository) CheckTableExists(tableName string) bool {
 }
 
 //CreateTable Create table
-func (r DataRepository) CreateTable(spec *model.Spec) error {
+func (r *DataRepository) CreateTable(spec *model.Spec) error {
 	sql := "create table " + spec.Name + " ("
 
 	cols := make([]string, len(spec.Columns))
@@ -60,7 +58,7 @@ func (r DataRepository) CreateTable(spec *model.Spec) error {
 }
 
 //Insert insert record into database
-func (r DataRepository) Insert(spec *model.Spec, records []*model.Record) error {
+func (r *DataRepository) Insert(spec *model.Spec, records []*model.Record) error {
 
 	sql := "insert into " + spec.Name + " ("
 
