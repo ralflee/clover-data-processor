@@ -1,0 +1,5 @@
+app:
+  specBasePath: "./specs"
+  dataBasePath: "./data"
+  dbConnectionURL: "postgres://test_user:12345678@localhost/test_db"
+  logSQL: true

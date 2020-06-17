@@ -1,12 +1,13 @@
 package source
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 //FileDataSource File data source
@@ -58,7 +59,7 @@ func (s *FileDataSource) GetDataPath(basePath string, specName string) []string 
 
 			//skip file which the name format is not valid
 			if err != nil {
-				fmt.Print(err)
+				log.Err(err).Send()
 				return nil
 			}
 			files = append(files, path)

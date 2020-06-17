@@ -4,10 +4,13 @@ import (
 	"clover-data-processor/app/model"
 	"database/sql"
 	"fmt"
-	"log"
+
+	//"log"
+	"clover-data-processor/app/constants"
 	"strings"
 
-	"clover-data-processor/app/constants"
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
 )
 
 //DataRepository data repository
@@ -17,7 +20,13 @@ type DataRepository struct {
 
 //CheckTableExists Check table exists
 func (r *DataRepository) CheckTableExists(tableName string) bool {
-	_, err := r.DB.Query("select 1 from " + tableName)
+	sql := "select 1 from " + tableName
+
+	if viper.GetBool("app.logSQL") {
+		log.Debug().Str("sql", sql).Send()
+	}
+
+	_, err := r.DB.Query(sql)
 	if err != nil {
 		return false
 	}
@@ -47,9 +56,13 @@ func (r *DataRepository) CreateTable(spec *model.Spec) error {
 	sql += strings.Join(cols, ",")
 	sql += ")"
 
+	if viper.GetBool("app.logSQL") {
+		log.Debug().Str("sql", sql).Send()
+	}
+
 	_, err := r.DB.Exec(sql)
 	if err != nil {
-		log.Fatal(err)
+		log.Err(err).Send()
 		return err
 	}
 
@@ -88,10 +101,13 @@ func (r *DataRepository) Insert(spec *model.Spec, records []*model.Record) error
 
 	sql += strings.Join(values, ",")
 
-	fmt.Println(sql)
+	if viper.GetBool("app.logSQL") {
+		log.Debug().Str("sql", sql).Send()
+	}
+
 	_, err := r.DB.Exec(sql)
 	if err != nil {
-		log.Fatal(err)
+		log.Err(err).Send()
 		return err
 	}
 

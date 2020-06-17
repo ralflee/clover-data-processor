@@ -61,6 +61,10 @@ table scheam didn't match spec
 
 connect with a mock DB
 
+mock data source
+mock repository
+mock paser
+
 ## Scheduler?
 
 ## TODO

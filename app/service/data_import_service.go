@@ -2,8 +2,9 @@ package service
 
 import (
 	"clover-data-processor/app/model"
-	"fmt"
 	"log"
+
+	"github.com/spf13/viper"
 )
 
 //RawDataSource Raw data source interface
@@ -35,12 +36,7 @@ type DataImportService struct {
 //ImportData Import data
 func (s *DataImportService) ImportData() error {
 	//get spec files
-	specFiles := s.DataSource.GetSpecPath("./specs")
-	for _, file := range specFiles {
-
-		fmt.Println(file)
-
-	}
+	specFiles := s.DataSource.GetSpecPath(viper.GetString("app.specBasePath"))
 
 	specs := make([]*model.Spec, len(specFiles))
 	for i, filePath := range specFiles {
@@ -65,8 +61,7 @@ func (s *DataImportService) ImportData() error {
 		}
 
 		//get data files
-		dataFiles := s.DataSource.GetDataPath("./data", spec.Name)
-		fmt.Println(dataFiles)
+		dataFiles := s.DataSource.GetDataPath(viper.GetString("app.dataBasePath"), spec.Name)
 
 		for _, file := range dataFiles {
 
