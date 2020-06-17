@@ -1,19 +1,60 @@
 # Clover Data Processor
 
-# Prerequisite
+## Prerequisite
+
 go 1.14 installed
 setup go root
 setup go patha
 running on linux
 
-# Quick start
+## Quick start
+
 go run main.go
 
+## Introduction
 
-# DB table
+Why choose golang
+
+How program due with invalid data:
+skip
+
+The nature of data processer software is quite different from a typical CRUD 
+
+
+
+## Abnormal data handling
+
+spec 
+- any abnormal behavior, skip the spec
+- length of column name
+- duplicated column names
+- more logging
+
+need to handle
+table scheam didn't match spec
+
+## DB table
+
 - primary key
 - creation time
 
-# Unit test
+## Configuration
 
-# Scheduler?
+- db connection url
+
+## Unit test
+
+connect with a mock DB
+
+## Scheduler?
+
+## TODO
+
+table name checking
+structure log
+
+## Improvements
+
+- DB table patching
+- NoSQL?
+- handle spec file name ordering

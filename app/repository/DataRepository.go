@@ -59,6 +59,7 @@ func (r DataRepository) CreateTable(spec *model.Spec) error {
 	return nil
 }
 
+//Insert insert record into database
 func (r DataRepository) Insert(spec *model.Spec, records []*model.Record) error {
 
 	sql := "insert into " + spec.Name + " ("
@@ -75,8 +76,13 @@ func (r DataRepository) Insert(spec *model.Spec, records []*model.Record) error 
 
 	for i, r := range records {
 		valueArr := make([]string, len(r.Columns))
-		for j, v := range r.Columns {
-			valueArr[j] = fmt.Sprintf("%v", v)
+		for j, c := range spec.Columns {
+			if c.Type == constants.ColumnTypeText {
+				valueArr[j] = fmt.Sprintf("'%v'", r.Columns[j])
+			} else {
+				valueArr[j] = fmt.Sprintf("%v", r.Columns[j])
+			}
+
 		}
 
 		values[i] = "(" + strings.Join(valueArr, ",") + ")"
@@ -84,8 +90,12 @@ func (r DataRepository) Insert(spec *model.Spec, records []*model.Record) error 
 
 	sql += strings.Join(values, ",")
 
-	//TODO, not finished
 	fmt.Println(sql)
+	_, err := r.DB.Exec(sql)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
 
 	return nil
 }

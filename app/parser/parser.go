@@ -176,20 +176,21 @@ func bytesToRecord(bytes []byte, spec *model.Spec) *model.Record {
 		for j := 0; j < col.Width; j++ {
 			r, size := utf8.DecodeRune(bytes)
 			c += string(r)
-			bytes = bytes[size:len(bytes)]
+			bytes = bytes[size:]
 		}
 
 		if col.Type == constants.ColumnTypeBoolean {
 			record.Columns[i] = c == "1"
 		} else if col.Type == constants.ColumnTypeInteger {
-			v, err := strconv.Atoi("-42")
+			v, err := strconv.Atoi(strings.TrimSpace(c))
 			if err != nil {
 				continue
 			}
 
 			record.Columns[i] = v
 		} else {
-			record.Columns[i] = c
+			//trim white spaces
+			record.Columns[i] = strings.TrimSpace(c)
 		}
 
 	}
