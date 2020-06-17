@@ -3,6 +3,7 @@ package repository
 import (
 	"clover-data-processor/app/model"
 	"database/sql"
+	"fmt"
 	"log"
 	"strings"
 
@@ -17,10 +18,12 @@ func (r DataRepository) CheckTableExists(tableName string) bool {
 	//var check string
 
 	//r.DB.QueryRow("SELECT 1 from '"+tableName+"'", tableName).Scan(check)
+	fmt.Println("aaa")
 	_, err := r.DB.Query("select 1 from " + tableName)
 	if err != nil {
 		return false
 	}
+
 	return true
 }
 
@@ -57,6 +60,7 @@ func (r DataRepository) CreateTable(spec *model.Spec) error {
 }
 
 func (r DataRepository) Insert(spec *model.Spec, records []*model.Record) error {
+
 	sql := "insert into " + spec.Name + " ("
 
 	cols := make([]string, len(spec.Columns))
@@ -69,5 +73,19 @@ func (r DataRepository) Insert(spec *model.Spec, records []*model.Record) error 
 
 	values := make([]string, len(records))
 
+	for i, r := range records {
+		valueArr := make([]string, len(r.Columns))
+		for j, v := range r.Columns {
+			valueArr[j] = fmt.Sprintf("%v", v)
+		}
+
+		values[i] = "(" + strings.Join(valueArr, ",") + ")"
+	}
+
+	sql += strings.Join(values, ",")
+
 	//TODO, not finished
+	fmt.Println(sql)
+
+	return nil
 }
