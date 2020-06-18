@@ -5,13 +5,13 @@ import (
 	"clover-data-processor/app/constants"
 	"clover-data-processor/app/model"
 	"encoding/csv"
-	"errors"
 	"io"
-	"log"
 	"os"
 	"strconv"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/rs/zerolog/log"
 )
 
 //FileDataParser File data parser
@@ -20,9 +20,12 @@ type FileDataParser struct {
 
 //ConstructSpec Construct spec
 func (p *FileDataParser) ConstructSpec(specFilePath string) (*model.Spec, error) {
+	log.Info().Str("filePath", specFilePath).Msg("Parsing spec file")
+
 	csvfile, err := os.Open(specFilePath)
 	if err != nil {
-		return nil, errors.New("Couldn't open the spec file")
+		log.Error().Str("filePath", specFilePath).Msg("Couldn't open the spec file")
+		return nil, err
 	}
 
 	r := csv.NewReader(csvfile)
@@ -33,38 +36,50 @@ func (p *FileDataParser) ConstructSpec(specFilePath string) (*model.Spec, error)
 	var s model.Spec
 	s.Name = specFilePath[strings.LastIndex(specFilePath, "/")+1 : strings.LastIndex(specFilePath, ".")]
 
-	// Iterate through the records
+	//iterate through the records
 	for {
 		// Read each record from csv
-		record, err := r.Read()
+		colDef, err := r.Read()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			log.Fatal(err)
+			log.Err(err).Send()
+			return nil, err
 		}
 
-		//TODO, if len is not 3, skip the line
-		width, err := strconv.Atoi(record[1])
-		if err != nil {
+		//if len is not 3, skip the line
+		if len(colDef) != 3 {
+			log.Error().Msg("column definition not correct")
+			continue
+		}
 
+		//pasre width
+		width, err := strconv.Atoi(colDef[1])
+		if err != nil {
+			log.Err(err).Send()
 			continue
 		}
 		if width < 1 {
-			log.Fatal("width < 1")
+			log.Err(err).Msg("width < 1")
+			continue
 		}
 
-		s.Columns = append(s.Columns, &model.Column{Name: record[0], Width: width, Type: record[2]})
+		s.Columns = append(s.Columns, &model.Column{Name: colDef[0], Width: width, Type: colDef[2]})
 	}
+
+	log.Info().Str("filePath", specFilePath).Msg("Construct spec success")
 
 	return &s, nil
 }
 
 //ConstructRecords construct records
 func (p *FileDataParser) ConstructRecords(dataFilePath string, spec *model.Spec) ([]*model.Record, error) {
+	log.Info().Str("filePath", dataFilePath).Msg("Parsing data file")
+
 	file, err := os.Open(dataFilePath)
 	if err != nil {
-		log.Fatal(err)
+		log.Error().Str("filePath", dataFilePath).Msg("Couldn't open the data file")
 		return nil, err
 	}
 	defer file.Close()
@@ -77,6 +92,8 @@ func (p *FileDataParser) ConstructRecords(dataFilePath string, spec *model.Spec)
 		record := bytesToRecord(b, spec)
 		records = append(records, record)
 	}
+
+	log.Info().Str("filePath", dataFilePath).Msg("Construct data success")
 
 	return records, nil
 }

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -33,8 +34,16 @@ func (s *FileDataSource) GetSpecPath(basePath string) []string {
 	})
 
 	if err != nil {
-		panic(err)
+		log.Err(err).Send()
+		return []string{}
 	}
+
+	logArray := zerolog.Arr()
+	for _, f := range files {
+		logArray.Str(f)
+	}
+	log.Info().Array("specFiles", logArray).Msg("Get spec files success")
+
 	return files
 }
 
@@ -69,7 +78,15 @@ func (s *FileDataSource) GetDataPath(basePath string, specName string) []string 
 	})
 
 	if err != nil {
-		panic(err)
+		log.Err(err).Send()
+		return []string{}
 	}
+
+	logArray := zerolog.Arr()
+	for _, f := range files {
+		logArray.Str(f)
+	}
+	log.Info().Array("specFiles", logArray).Msg("Get data files success")
+
 	return files
 }
