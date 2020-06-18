@@ -4,7 +4,7 @@
 
 1. golang 1.14
 2. setup go root and go path
-3. postgreSQL 11+
+3. postgre DB 11+
 
 In Linux, set up go root and go path
 
@@ -12,6 +12,8 @@ In Linux, set up go root and go path
 export GOROOT=$HOME/go
 export PATH=$PATH:$GOROOT/bin
 ```
+
+*The program only support postgre DB for now.*
 
 ## Quick start
 
@@ -103,6 +105,8 @@ Remarks: refer to data_repository.go
 ## Configuration
 
 The configuration is put in config/config.yml
+
+You may need to update *dbConnectionURL* to point to a available PostgresDB
 
 ## Abnormal data handling
 
