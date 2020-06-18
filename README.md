@@ -15,17 +15,25 @@ export PATH=$PATH:$GOROOT/bin
 
 ## Quick start
 
+Run
+
 ```bash
 go run main.go
+```
+
+Build
+
+```bash
+go build
 ```
 
 ## Introduction
 
 ### Why choose golang
 
-Golang is a static typed general purpose programming lanuague. It is famous for it simple syntax, built-in concurrency, fast compile time and light in memory.
+Golang is a static typed general purpose programming lanuague. It is famous for it's simple syntax, built-in concurrency, fast compile time and light in memory.
 
-It is to showcase that golang can be a efficient *script* language to do simple and routine tasks, just like the nature of this assignment
+This program is to showcase that golang can be a efficient *script* language to do simple and routine tasks, just like the nature of this assignment.
 
 ### Design
 
@@ -125,7 +133,7 @@ go test ./...
 
 The current code coverage is around 50%.  
 
-The code coverage report can be display through following commands:
+The code coverage report can be display through following commands. It report highligted coverage on each go file.
 
 ```bash
 go test -v -coverpkg=./... -coverprofile=coverage.out ./...
@@ -153,8 +161,9 @@ mockery -name=DataRepository -dir=./app/service -output=./app/service/mocks -fil
 
 ## Improvements
 
-Potential improvements can be done it the program
+Potential improvements can be done in the program
 
 - Table name checking, check whether special characters which is allowed for a file name but not allowed for a DB table name
 - Unit test should cover error cases.
 - Unit test should cover repository by mocking a database. Mocking a database is possible in golang [Sql driver mock for Golang](https://github.com/DATA-DOG/go-sqlmock)
+- The program should *save* which data files have processed. So that a second run of the program won't write the same record to the DB twice or more. We can use a reserved DB table to log down which and when do a file is processed.
