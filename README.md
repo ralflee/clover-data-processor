@@ -57,15 +57,43 @@ table scheam didn't match spec
 
 - db connection url
 
-## Unit test
+## Test
 
-connect with a mock DB
+The offical [The cover story](https://blog.golang.org/cover). A recommended reading.
 
-mock data source
-mock repository
-mock paser
+Remarks: In golang, test files' name has suffix *_test.go*. In convention, test files are put in same directory of the target go file
 
-## Scheduler?
+### Unit Test
+
+```bash
+go test ./...  
+```
+
+### Unit test with coverage report
+
+```bash
+go test -v -coverpkg=./... -coverprofile=coverage.out ./...
+go tool cover -html=coverage.out
+```
+
+### Mocking - Mockery
+
+Mockery is used to generate mock struts
+
+Install Mockery through homebrew
+
+```bash
+brew install vektra/tap/mockery
+brew upgrade mockery
+```
+
+Generate the mocks by calling the mockery command.  
+
+E.g. Generate mock repositories:
+
+```bash
+mockery -name=DataRepository -dir=./app/service -output=./app/service/mocks -filename=mock_data_repository.go
+```
 
 ## TODO
 
